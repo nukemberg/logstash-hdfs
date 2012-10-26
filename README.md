@@ -9,7 +9,7 @@ Usage
 run logstash with the `--pluginpath` (`-p`) command line argument to let logstash know where the plugin is. Also, you need to let Java know where your Hadoop JARs are, so set the `CLASSPATH` variable correctly.
 E.G.
 
-    java -jar logstash-1.1.3-monolithic.jar agent -f conf/hdfs-output.conf -p /path/to/cloned/logstash-hdfs
+    CLASSPATH=$(find /path/to/hadoop -name '*.jar' | tr '\n' ':'):/etc/hadoop/conf java -jar logstash-1.1.3-monolithic.jar agent -f conf/hdfs-output.conf -p /path/to/cloned/logstash-hdfs
 
 
 Config options are basically the same as the file output, but have a look at the `doc/` directory for specfics. 
