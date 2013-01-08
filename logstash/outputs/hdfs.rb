@@ -85,7 +85,7 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
     path = Path.new(path_string)
     if @hdfs.exists(path)
       if enable_append
-        dfs_data_output_stream = @hdfs.append(path, false)
+        dfs_data_output_stream = @hdfs.append(path)
       elsif enable_reopen
         logger.warn "Overwritting HDFS file", :path => path_string
         dfs_data_output_stream = @hdfs.create(path, true)
