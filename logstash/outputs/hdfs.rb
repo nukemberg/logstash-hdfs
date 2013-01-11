@@ -46,6 +46,7 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
     flush_interval = @flush_interval.to_i
     @stale_cleanup_interval = 10
     conf = Configuration.new
+    @logger.info "Using Hadoop configuration: #{conf.get("fs.defaultFS")}"
     @hdfs = FileSystem.get(conf)
   end # def register
 
@@ -55,10 +56,11 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
     out = get_output_stream(event.sprintf(@path))
 
     if @message_format
-      output = event.sprintf(@message_format) + "\n"
+      output = event.sprintf(@message_format)
     else
       output = event.to_json
     end
+    output += "\n" unless output.end_with? "\n"
 
     out.write(output)
 
