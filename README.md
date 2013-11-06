@@ -17,6 +17,19 @@ Important: the Hadoop configuration dir containing `hdfs-site.xml` must be on th
 
 Config options are basically the same as the file output, but have a look at the `doc/` directory for specfics. 
 
+HDFS Configuration
+=============
+By default, the plugin will use Hadoop's default configuration location.  However, a logstash configuration option named 'hadoop_config_resources' has
+been added that will allow the user to pass in multiple configuration classpath locations to override this default configuration.
+
+    output {
+            hdfs {
+                path => "/path/to/output_file.log"
+                hadoop_config_resources => ['path/to/configuration/on/classpath/hdfs-site.xml']
+            }
+        }
+
+
 HDFS Append and rewriting files
 =============
 Please note, HDFS versions prior to 2.x do not properly support append. See [HADOOP-8230](https://issues.apache.org/jira/browse/HADOOP-8230) for reference.

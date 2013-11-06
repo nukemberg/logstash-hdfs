@@ -32,6 +32,9 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
   # Enable re-opening files. This is a really a bad idea because HDFS will truncate files. Only use if you know what you're doing
   config :enable_reopen, :validate => :boolean, :default => false
 
+  # The classpath resource locations of the hadoop configuration
+  config :hadoop_config_resources, :validate => :array
+
   public
   def register
     require "java"
@@ -46,6 +49,13 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
     flush_interval = @flush_interval.to_i
     @stale_cleanup_interval = 10
     conf = Configuration.new
+
+    if @hadoop_config_resources
+      @hadoop_config_resources.each { |resource|
+        conf.addResource(resource)
+      }
+    end
+
     @logger.info "Using Hadoop configuration: #{conf.get("fs.defaultFS")}"
     @hdfs = FileSystem.get(conf)
   end # def register
