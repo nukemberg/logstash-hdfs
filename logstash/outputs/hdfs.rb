@@ -8,7 +8,7 @@ require "logstash/outputs/base"
 class LogStash::Outputs::HDFS < LogStash::Outputs::Base
 
   config_name "hdfs"
-  plugin_status "beta"
+  milestone 1
 
   # The path to the file to write. Event fields can be used here, 
   # like "/var/log/logstash/%{@source_host}/%{application}"
@@ -97,7 +97,13 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
     path = Path.new(path_string)
     if @hdfs.exists(path)
       if enable_append
-        dfs_data_output_stream = @hdfs.append(path)
+        begin
+          dfs_data_output_stream = @hdfs.append(path)
+        rescue java.io.IOException => e
+          logger.error("Error opening path for append, trying to recover lease", :exception => e)
+          recover_lease(path)
+          retry
+        end
       elsif enable_reopen
         logger.warn "Overwritting HDFS file", :path => path_string
         dfs_data_output_stream = @hdfs.create(path, true)
@@ -146,6 +152,30 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
     @last_stale_cleanup_cycle = now
   end
 
+  def recover_lease(path)
+    is_file_closed_available = @hdfs.respond_to? :isFileClosed
+    start = Time.now
+    first_retry = true
+
+    until start - Time.now > 900 # 15 minutes timeout 
+      recovered = @hdfs.recoverLease(path)
+      return true if recovered
+      # first retry is fast
+      if first_retry
+        sleep 4
+        first_retry = false
+        next
+      end
+
+      # on further retries we backoff and spin on isFileClosed in hopes of catching an early break
+      61.times do
+        return if is_closed_available and @hdfs.isFileClosed(path)
+        sleep 1
+      end
+    end
+    false
+  end
+
   class DFSOutputStreamWrapper
     # reflection locks java objects, so only do this once
     if org.apache.hadoop.fs.FSDataOutputStream.instance_methods.include? :hflush
@@ -160,6 +190,8 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
     end
     def close
       @output_stream.close
+    rescue IOException => e
+      logger.error("Failed to close file", :exception => e)
     end
     def flush
       if FLUSH_METHOD == :hflush
@@ -168,6 +200,8 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
         @output_stream.flush
         @output_stream.sync
       end
+    rescue
+
     end
     def write(str)
       bytes = str.to_java_bytes
