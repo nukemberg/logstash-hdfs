@@ -22,7 +22,7 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
   # event will be written as a single line.
   config :message_format, :validate => :string
 
-  # Flush interval for flushing writes to log files. 0 will flush on every meesage
+  # Flush interval for flushing writes to log files. 0 will flush on every message
   # Flush doesn't actually work on most Hadoop 1.x versions. if you really care about flush, use 2.x 
   config :flush_interval, :validate => :number, :default => 60
 
