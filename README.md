@@ -11,6 +11,10 @@ E.G.
 
     CLASSPATH=$(find /path/to/hadoop -name '*.jar' | tr '\n' ':'):/etc/hadoop/conf:/path/to/logstash-1.1.7-monolithic.jar java logstash.runner agent -f conf/hdfs-output.conf -p /path/to/cloned/logstash-hdfs
 
+On Logstash 1.4.x use the following command (ajusting paths as neccessary of course):
+
+    LD_LIBRARY_PATH="/usr/lib/hadoop/lib/native" GEM_HOME=./logstash-1.4.2/vendor/bundle/jruby/1.9 CLASSPATH=$(find ./logstash-1.4.2/vendor/jar -type f -name '*.jar'|tr '\n' ':'):$(find /usr/lib/oozie -type f -name '*.jar'|tr '\n' ':'):$(find /usr/lib/hadoop-hdfs -type f -name '*.jar' | tr '\n' ':'):$(find /usr/lib/hadoop -type f -name '*.jar' | tr '\n' ':'):/etc/hadoop/conf java org.jruby.Main -I./logstash-1.4.2/lib ./logstash-1.4.2/lib/logstash/runner.rb agent -f ./logstash-1.4.2/etc/conf.d/input_redis.conf -p ./logstash-hdfs
+
 Note that logstash is not executed with `java -jar` because executable jars ignore external classpath. Instead we put the logstash jar on the class path and call the runner class.
 Important: the Hadoop configuration dir containing `hdfs-site.xml` must be on the classpath.
 
