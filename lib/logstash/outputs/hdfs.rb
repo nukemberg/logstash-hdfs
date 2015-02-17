@@ -169,7 +169,7 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
 
       # on further retries we backoff and spin on isFileClosed in hopes of catching an early break
       61.times do
-        return if is_closed_available and @hdfs.isFileClosed(path)
+        return if is_file_closed_available and @hdfs.isFileClosed(path)
         sleep 1
       end
     end
