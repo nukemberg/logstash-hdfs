@@ -16,7 +16,7 @@ Important: the Hadoop configuration dir containing `hdfs-site.xml` must be on th
 
 ## Logstash 1.5.x
 
-Logstash 1.5.x supports distribution of plugins as rubygems which makes life a log easier. To install the plugin from the version on rubygems:
+Logstash 1.5.x supports distribution of plugins as rubygems which makes life a lot easier. To install the plugin from the version on rubygems:
 
     $LOGSTASH_DIR/bin/plugin install logstash-output-hdfs
 
