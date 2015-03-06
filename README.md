@@ -26,13 +26,13 @@ Or from source (after checking out the source, run in checkout directory):
     
 Then run logstash with the following command:
 
-    LD_LIBRARY_PATH="$HADOOP_DIR/lib/native" CLASSPATH=$(find $HADOOP_DIR/share/hadoop/common/lib/ -name '*.jar' | tr '\n' ':'):$HADOOP_DIR/share/hadoop/hdfs/hadoop-hdfs-2.4.0.jar:$HADOOP_DIR/share/hadoop/common/hadoop-common-2.4.0.jar:$HADOOP_DIR/conf $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
+    LD_LIBRARY_PATH="$HADOOP_DIR/lib/native" CLASSPATH=$(find $HADOOP_DIR/share/hadoop/common/lib/ -name '*.jar' | grep -v sources | tr '\n' ':'):$HADOOP_DIR/share/hadoop/hdfs/hadoop-hdfs-2.4.0.jar:$HADOOP_DIR/share/hadoop/common/hadoop-common-2.4.0.jar:$HADOOP_DIR/conf $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
 
 Hadoop paths may need adjustments depending on the distribution and version you are using. The important thing is to have `hadoop-hdfs`, `hadoop-common` and all the jar files in `common/lib` on the classpath.
 
 The following comman line will work on most distributions (but will take a little longer to load since it loads many unnecessary jars):
 
-    LD_LIBRARY_PATH="/usr/lib/hadoop/lib/native" CLASSPATH=$(find /usr/lib/hadoop-hdfs -type f -name '*.jar' | tr '\n' ':'):$(find /usr/lib/hadoop -type f -name '*.jar' | tr '\n' ':'):/etc/hadoop/conf $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
+    LD_LIBRARY_PATH="/usr/lib/hadoop/lib/native" CLASSPATH=$(find /usr/lib/hadoop-hdfs -type f -name '*.jar' | tr '\n' ':'):$(find /usr/lib/hadoop -type f -name '*.jar' | grep -v sources | tr '\n' ':'):/etc/hadoop/conf $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
  
 
 # HDFS Configuration
