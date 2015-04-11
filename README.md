@@ -24,13 +24,13 @@ Or from source (after checking out the source, run in checkout directory):
 
     $LOGSTASH_DIR/bin/plugin build logstash-output-hdfs.gemspec
     
-Then run logstash with the following command:
+Then run logstash with the following command (change jar versions and locations as per your hadoop installation):
 
-    LD_LIBRARY_PATH="$HADOOP_DIR/lib/native" CLASSPATH=$(find $HADOOP_DIR/share/hadoop/common/lib/ -name '*.jar' | grep -v sources | tr '\n' ':'):$HADOOP_DIR/share/hadoop/hdfs/hadoop-hdfs-2.4.0.jar:$HADOOP_DIR/share/hadoop/common/hadoop-common-2.4.0.jar:$HADOOP_DIR/conf $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
+    LD_LIBRARY_PATH="$HADOOP_DIR/lib/native" CLASSPATH=$HADOOP_DIR/share/hadoop/common/lib/htrace-core-3.0.4.jar:$HADOOP_DIR/share/hadoop/common/lib/protobuf-java-2.5.0.jar:$HADOOP_DIR/share/hadoop/common/lib/commons-cli-1.2.jar:$HADOOP_DIR/share/hadoop/common/lib/slf4j-api-1.7.5.jar:$HADOOP_DIR/share/hadoop/common/lib/hadoop-auth-2.6.0.jar:$HADOOP_DIR/share/hadoop/common/lib/commons-lang-2.6.jar:$HADOOP_DIR/share/hadoop/common/lib/commons-configuration-1.6.jar:$HADOOP_DIR/share/hadoop/common/lib/commons-collections-3.2.1.jar:$HADOOP_DIR/share/hadoop/common/lib/guava-11.0.2.jar:$HADOOP_DIR/share/hadoop/common/lib/commons-logging-1.1.3.jar:$HADOOP_DIR/share/hadoop/hdfs/hadoop-hdfs-2.6.0.jar:$HADOOP_DIR/share/hadoop/common/hadoop-common-2.6.0.jar:$HADOOP_DIR/conf $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
 
-Hadoop paths may need adjustments depending on the distribution and version you are using. The important thing is to have `hadoop-hdfs`, `hadoop-common` and all the jar files in `common/lib` on the classpath.
+Hadoop paths may need adjustments depending on the distribution and version you are using. The important thing is to have `hadoop-hdfs`, `hadoop-common` and the dependencies from `common/lib` on the classpath.
 
-The following comman line will work on most distributions (but will take a little longer to load since it loads many unnecessary jars):
+The following command line will work on most distributions (but will take a little longer to load since it loads many unnecessary jars) - note there may be conflicts with other plugins (e.g. elasticsearch) if you load all the jars:
 
     LD_LIBRARY_PATH="/usr/lib/hadoop/lib/native" CLASSPATH=$(find /usr/lib/hadoop-hdfs -type f -name '*.jar' | tr '\n' ':'):$(find /usr/lib/hadoop -type f -name '*.jar' | grep -v sources | tr '\n' ':'):/etc/hadoop/conf $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
  
