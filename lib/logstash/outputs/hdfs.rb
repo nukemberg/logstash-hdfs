@@ -154,6 +154,10 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
 
   def recover_lease(path)
     is_file_closed_available = @hdfs.respond_to? :isFileClosed
+
+    # Not all Hadoop file systems support recover lease (e.g. LocalFileSystem)
+    return true unless @hdfs.respond_to? :recoverLease
+
     start = Time.now
     first_retry = true
 
