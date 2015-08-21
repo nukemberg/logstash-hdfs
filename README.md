@@ -32,7 +32,7 @@ Hadoop paths may need adjustments depending on the distribution and version you 
 
 The following command line will work on most distributions (but will take a little longer to load since it loads many unnecessary jars) - note there may be conflicts with other plugins (e.g. elasticsearch) if you load all the jars:
 
-    LD_LIBRARY_PATH="/usr/lib/hadoop/lib/native" CLASSPATH=$(find /usr/lib/hadoop-hdfs -type f -name '*.jar' | tr '\n' ':'):$(find /usr/lib/hadoop -type f -name '*.jar' | grep -v sources | tr '\n' ':'):/etc/hadoop/conf $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
+    LD_LIBRARY_PATH="/usr/lib/hadoop/lib/native" CLASSPATH=$(hadoop classpath) $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
  
 
 # HDFS Configuration
