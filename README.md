@@ -1,75 +1,89 @@
-# Logstash HDFS plugin
+# Logstash Plugin
 
-An HDFS plugin for [Logstash](http://logstash.net). This plugin is provided as an external plugin (see Usage below) and is not part of the Logstash project.
+[![Build
+Status](http://build-eu-00.elastic.co/view/LS%20Plugins/view/LS%20Outputs/job/logstash-plugin-output-example-unit/badge/icon)](http://build-eu-00.elastic.co/view/LS%20Plugins/view/LS%20Outputs/job/logstash-plugin-output-example-unit/)
 
-# Usage
+This is a plugin for [Logstash](https://github.com/elastic/logstash).
 
-## Logstash 1.4.x
+It is fully free and fully open source. The license is Apache 2.0, meaning you are pretty much free to use it however you want in whatever way.
 
-Run logstash with the `--pluginpath` (`-p`) command line argument to let logstash know where the plugin is. Also, you need to let Java know where your Hadoop JARs are, so set the `CLASSPATH` variable correctly.
-On Logstash 1.4.x use the following command (ajusting paths as neccessary of course):
+## Documentation
 
-    LD_LIBRARY_PATH="/usr/lib/hadoop/lib/native" GEM_HOME=./logstash-1.4.2/vendor/bundle/jruby/1.9 CLASSPATH=$(find ./logstash-1.4.2/vendor/jar -type f -name '*.jar'|tr '\n' ':'):$(find /usr/lib/hadoop-hdfs -type f -name '*.jar' | tr '\n' ':'):$(find /usr/lib/hadoop -type f -name '*.jar' | tr '\n' ':'):/etc/hadoop/conf java org.jruby.Main -I./logstash-1.4.2/lib ./logstash-1.4.2/lib/logstash/runner.rb agent -f logstash.conf -p ./logstash-hdfs/lib
+Logstash provides infrastructure to automatically generate documentation for this plugin. We use the asciidoc format to write documentation so any comments in the source code will be first converted into asciidoc and then into html. All plugin documentation are placed under one [central location](http://www.elastic.co/guide/en/logstash/current/).
 
-Note that logstash is not executed with `java -jar` because executable jars ignore external classpath. Instead we put the logstash jar on the class path and call the runner class.
-Important: the Hadoop configuration dir containing `hdfs-site.xml` must be on the classpath.
+- For formatting code or config example, you can use the asciidoc `[source,ruby]` directive
+- For more asciidoc formatting tips, see the excellent reference here https://github.com/elastic/docs#asciidoc-guide
 
-## Logstash 1.5.x
+## Need Help?
 
-Logstash 1.5.x supports distribution of plugins as rubygems which makes life a lot easier. To install the plugin from the version on rubygems:
+Need help? Try #logstash on freenode IRC or the https://discuss.elastic.co/c/logstash discussion forum.
 
-    $LOGSTASH_DIR/bin/plugin install logstash-output-hdfs
+## Developing
 
-Or from source (after checking out the source, run in checkout directory):
+### 1. Plugin Developement and Testing
 
-    $LOGSTASH_DIR/bin/plugin build logstash-output-hdfs.gemspec
-    
-Then run logstash with the following command (change jar versions and locations as per your hadoop installation):
+#### Code
+- To get started, you'll need JRuby with the Bundler gem installed.
 
-    LD_LIBRARY_PATH="$HADOOP_DIR/lib/native" CLASSPATH=$HADOOP_DIR/share/hadoop/common/lib/htrace-core-3.0.4.jar:$HADOOP_DIR/share/hadoop/common/lib/protobuf-java-2.5.0.jar:$HADOOP_DIR/share/hadoop/common/lib/commons-cli-1.2.jar:$HADOOP_DIR/share/hadoop/common/lib/slf4j-api-1.7.5.jar:$HADOOP_DIR/share/hadoop/common/lib/hadoop-auth-2.6.0.jar:$HADOOP_DIR/share/hadoop/common/lib/commons-lang-2.6.jar:$HADOOP_DIR/share/hadoop/common/lib/commons-configuration-1.6.jar:$HADOOP_DIR/share/hadoop/common/lib/commons-collections-3.2.1.jar:$HADOOP_DIR/share/hadoop/common/lib/guava-11.0.2.jar:$HADOOP_DIR/share/hadoop/common/lib/commons-logging-1.1.3.jar:$HADOOP_DIR/share/hadoop/hdfs/hadoop-hdfs-2.6.0.jar:$HADOOP_DIR/share/hadoop/common/hadoop-common-2.6.0.jar:$HADOOP_DIR/conf $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
+- Create a new plugin or clone and existing from the GitHub [logstash-plugins](https://github.com/logstash-plugins) organization. We also provide [example plugins](https://github.com/logstash-plugins?query=example).
 
-Hadoop paths may need adjustments depending on the distribution and version you are using. The important thing is to have `hadoop-hdfs`, `hadoop-common` and the dependencies from `common/lib` on the classpath.
+- Install dependencies
+```sh
+bundle install
+```
 
-The following command line will work on most distributions (but will take a little longer to load since it loads many unnecessary jars) - note there may be conflicts with other plugins (e.g. elasticsearch) if you load all the jars:
+#### Test
 
-    LD_LIBRARY_PATH="/usr/lib/hadoop/lib/native" CLASSPATH=$(hadoop classpath) $LOGSTASH_DIR/bin/logstash agent -f logstash.conf
- 
+- Update your dependencies
 
-# HDFS Configuration
+```sh
+bundle install
+```
 
-By default, the plugin will load Hadoop's configuration from the classpath.  However, a logstash configuration option named 'hadoop_config_resources' has
-been added that will allow the user to pass in multiple configuration locations to override this default configuration.
+- Run tests
 
-    output {
-            hdfs {
-                path => "/path/to/output_file.log"
-                hadoop_config_resources => ['path/to/configuration/on/classpath/hdfs-site.xml', 'path/to/configuration/on/classpath/core-site.xml']
-            }
-        }
+```sh
+bundle exec rspec
+```
 
+### 2. Running your unpublished Plugin in Logstash
 
-# HDFS Append and rewriting files
+#### 2.1 Run in a local Logstash clone
 
-Please note, HDFS versions prior to 2.x do not properly support append. See [HADOOP-8230](https://issues.apache.org/jira/browse/HADOOP-8230) for reference.
-To enable append on HDFS, set _dfs.support.append_ in <tt>hdfs-site.conf</tt> (2.x) or _dfs.support.broken.append_ on 1.x, and use the *enable_append* config option:
+- Edit Logstash `Gemfile` and add the local plugin path, for example:
+```ruby
+gem "logstash-filter-awesome", :path => "/your/local/logstash-filter-awesome"
+```
+- Install plugin
+```sh
+bin/plugin install --no-verify
+```
+- Run Logstash with your plugin
+```sh
+bin/logstash -e 'filter {awesome {}}'
+```
+At this point any modifications to the plugin code will be applied to this local Logstash setup. After modifying the plugin, simply rerun Logstash.
 
-    output {
-        hdfs {
-            path => "/path/to/output_file.log"
-            enable_append => true
-        }
-    }
+#### 2.2 Run in an installed Logstash
 
-If append is not supported and the file already exists, the plugin will cowardly refuse to reopen the file for writing unless *enable_reopen* is set to true.
-This is probably a very bad idea, you have been warned!
+You can use the same **2.1** method to run your plugin in an installed Logstash by editing its `Gemfile` and pointing the `:path` to your local plugin development directory or you can build the gem and install it using:
 
-# HFDS Flush
+- Build your plugin gem
+```sh
+gem build logstash-filter-awesome.gemspec
+```
+- Install the plugin from the Logstash home
+```sh
+bin/plugin install /your/local/plugin/logstash-filter-awesome.gem
+```
+- Start Logstash and proceed to test the plugin
 
-Flush and sync don't actually work as promised on HDFS (see [HDFS-536](https://issues.apache.org/jira/browse/HDFS-536)).
-In Hadoop 2.x, `hflush` provides flush-like functionality and the plugin will use `hflush` if it is available.
-Nevertheless, flushing code has been left in the plugin in case `flush` and `sync` will work on some HDFS implementation.
+## Contributing
 
-# License
+All contributions are welcome: ideas, patches, documentation, bug reports, complaints, and even something you drew up on a napkin.
 
-The plugin is released under the LGPL v3.
+Programming is not a required skill. Whatever you've seen about open source and maintainers or community members  saying "send patches or die" - you will not see that here.
 
+It is more important to the community that you are able to contribute.
+
+For more information about contributing, see the [CONTRIBUTING](https://github.com/elastic/logstash/blob/master/CONTRIBUTING.md) file.

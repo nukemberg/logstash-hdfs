@@ -1,11 +1,13 @@
-require "logstash/namespace"
+# encoding: utf-8
 require "logstash/outputs/base"
+require "logstash/namespace"
+require "logstash-output-hdfs_jars.rb"
 
 # HDFS output.
 #
 # Write events to files to HDFS. You can use fields from the
 # event as parts of the filename.
-class LogStash::Outputs::HDFS < LogStash::Outputs::Base
+class LogStash::Outputs::Hdfs < LogStash::Outputs::Base
 
   config_name "hdfs"
 
@@ -212,5 +214,4 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
       @active = true
     end
   end
-end # class LogStash::Outputs::File
-
+end # class LogStash::Outputs::Hdfs
