@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name          = 'logstash-output-hdfs'
-  s.version       = "0.3.0"
+  s.version       = "2.0.1"
   s.licenses      = ["Apache License (2.0)"]
   s.summary       = "This output writes files to HDFS."
   s.description   = "This gem is a logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/plugin install gemname. This gem is not a stand-alone program"
@@ -9,11 +9,8 @@ Gem::Specification.new do |s|
   s.homepage      = "http://www.elastic.co/guide/en/logstash/current/index.html"
   s.require_paths = ["lib"]
 
-  # important to get the jars installed
-  #s.platform = 'java'
-
   # Files
-  s.files = Dir['lib/**/*','spec/**/*','vendor/**/*','*.gemspec','*.md','CONTRIBUTORS','Gemfile','Jarfile','LICENSE','NOTICE.TXT']
+  s.files = Dir['lib/**/*','spec/**/*','vendor/**/*','*.gemspec','*.md','CONTRIBUTORS','Gemfile','LICENSE','NOTICE.TXT']
    # Tests
   s.test_files = s.files.grep(%r{^(test|spec|features)/})
 
