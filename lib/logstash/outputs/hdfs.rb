@@ -1,11 +1,13 @@
-require "logstash/namespace"
+# encoding: utf-8
 require "logstash/outputs/base"
+require "logstash/namespace"
+require "logstash-output-hdfs_jars.rb"
 
 # HDFS output.
 #
 # Write events to files to HDFS. You can use fields from the
 # event as parts of the filename.
-class LogStash::Outputs::HDFS < LogStash::Outputs::Base
+class LogStash::Outputs::Hdfs < LogStash::Outputs::Base
 
   config_name "hdfs"
 
@@ -37,9 +39,12 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
   public
   def register
     require "java"
-    java_import "org.apache.hadoop.fs.Path"
+    java_import "java.net.URI"
     java_import "org.apache.hadoop.fs.FileSystem"
+    java_import "org.apache.hadoop.hdfs.DistributedFileSystem"
     java_import "org.apache.hadoop.conf.Configuration"
+    java_import "org.apache.hadoop.fs.Path"
+    java_import "org.apache.hadoop.fs.permission.FsPermission"
 
     @files = {}
     now = Time.now
@@ -47,16 +52,16 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
     @last_stale_cleanup_cycle = now
     flush_interval = @flush_interval.to_i
     @stale_cleanup_interval = 10
-    conf = Configuration.new
+    conf = org.apache.hadoop.conf.Configuration.new
 
     if @hadoop_config_resources
       @hadoop_config_resources.each { |resource|
-        conf.addResource(resource)
+        conf.addResource(Path.new(resource))
       }
     end
 
     @logger.info "Using Hadoop configuration: #{conf.get("fs.defaultFS")}"
-    @hdfs = FileSystem.get(conf)
+    @hdfs = org.apache.hadoop.fs.FileSystem.get(conf)
   end # def register
 
   public
@@ -212,5 +217,4 @@ class LogStash::Outputs::HDFS < LogStash::Outputs::Base
       @active = true
     end
   end
-end # class LogStash::Outputs::File
-
+end # class LogStash::Outputs::Hdfs
