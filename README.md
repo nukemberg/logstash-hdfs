@@ -71,5 +71,5 @@ Nevertheless, flushing code has been left in the plugin in case `flush` and `syn
 
 # License
 
-The plugin is released under the LGPL v3.
+The plugin is released under the Apache V2 license.
 
